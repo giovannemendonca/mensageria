@@ -1,0 +1,91 @@
+{
+  "users": [
+    {
+      "name": "development",
+      "password_hash" : "xIx779kL9EpjNAZID3t13Ll10QhKuPfNNUh3wKB/coxRsLBj",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "development",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "queues": [
+    {
+      "name": "qu_test_sender",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false
+    },
+    {
+      "name": "qu_cn_notification_sender",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-dead-letter-exchange": "ex_cn_notification",
+        "x-dead-letter-routing-key": "rk_cn_notification_sender_dlq",
+        "x-message-ttl": 60000
+      }
+    },
+    {
+      "name": "qu_cn_notification_sender_dlq",
+        "vhost": "/",
+        "durable": true,
+        "auto_delete": false
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "ex_test_sender",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "ex_cn_notification",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "ex_test_sender",
+      "vhost": "/",
+      "destination": "qu_test_sender",
+      "destination_type": "queue",
+      "routing_key": "rk_test_sender"
+    },
+    {
+      "source": "ex_cn_notification",
+      "vhost": "/",
+      "destination": "qu_cn_notification_sender",
+      "destination_type": "queue",
+      "routing_key": "rk_cn_notification_sender"
+    },
+    {
+      "source": "ex_cn_notification",
+      "vhost": "/",
+      "destination": "qu_cn_notification_sender_dlq",
+      "destination_type": "queue",
+      "routing_key": "rk_cn_notification_sender_dlq"
+    }
+  ]
+}
